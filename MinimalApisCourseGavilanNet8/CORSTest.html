@@ -1,0 +1,34 @@
+﻿﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+
+<body>
+    <h1>CORS Test of the Web API (press F12) </h1>
+    <script>
+        const urlWebAPI = 'https://localhost:7294/genres';
+
+        consumeWebAPI();
+
+        async function consumeWebAPI() {
+            // try {
+            const response = await fetch(urlWebAPI, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const json = await response.json();
+            console.log(json);
+            // } catch (error) {
+            //     console.log(error);
+            // }
+
+        }
+    </script>
+</body>
+
+</html>
