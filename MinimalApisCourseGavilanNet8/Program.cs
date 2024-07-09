@@ -1,10 +1,14 @@
 using Microsoft.AspNetCore.Cors;
+using Microsoft.EntityFrameworkCore;
+using MinimalApisCourseGavilanNet8;
 using MinimalApisCourseGavilanNet8.Entities;
 using System.Xml.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //Services zone - BEGIN
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer("name=DefaultConnection"));
 
 builder.Services.AddCors(options =>
 {
@@ -55,6 +59,7 @@ app.MapGet("/", () => "Hello World!");
 //app.MapGet("/genres", [EnableCors(policyName: "free")] () => 
 app.MapGet("/genres", () => 
 {
+    var myvar = 0;
     var genres = new List<Genre>()
     {
         new Genre
