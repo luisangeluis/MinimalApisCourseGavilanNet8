@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.EntityFrameworkCore;
 using MinimalApisCourseGavilanNet8;
 using MinimalApisCourseGavilanNet8.Entities;
+using MinimalApisCourseGavilanNet8.Repositories;
 using System.Xml.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,8 @@ builder.Services.AddOutputCache();
 //SWAGGER
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IGenresRepository,GenresRepository>();
 
 //Services zone - END
 
@@ -84,5 +87,11 @@ app.MapGet("/genres", () =>
     return genres;
     //Tiempo que dura la cache si vuelvo a hacer la peticion antes de los 15 segundos me devuelve la info de cache
 }).CacheOutput(c=>c.Expire(TimeSpan.FromSeconds(15)));
+
+app.MapPost("/genres", async (Genre genre, IGenresRepository repository) =>
+{
+    var id = await repository.Create(genre);
+    return Results.Created($"/Genres/{id}", genre);
+});
 
 app.Run();
