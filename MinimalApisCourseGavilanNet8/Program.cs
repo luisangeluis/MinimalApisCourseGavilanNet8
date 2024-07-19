@@ -60,33 +60,22 @@ app.UseOutputCache();
 
 app.MapGet("/", () => "Hello World!");
 //app.MapGet("/genres", [EnableCors(policyName: "free")] () => 
-app.MapGet("/genres", () => 
+app.MapGet("/genres", async(IGenresRepository repository) => 
 {
-    var myvar = 0;
-    var genres = new List<Genre>()
-    {
-        new Genre
-        {
-            Id=1,
-            Name = "Drama"
-        },
+    return await repository.GetAll();
 
-        new Genre
-        {
-            Id=2,
-            Name = "Action"
-        },
-
-        new Genre
-        {
-            Id=3,
-            Name = "Horror"
-        }
-    };
-
-    return genres;
     //Tiempo que dura la cache si vuelvo a hacer la peticion antes de los 15 segundos me devuelve la info de cache
 }).CacheOutput(c=>c.Expire(TimeSpan.FromSeconds(15)));
+
+app.MapGet("/genres/{id:int}", async (int id, IGenresRepository repository) =>
+{
+    var genre = await repository.GetById(id);
+
+    if (genre is null)
+        return Results.NotFound();
+
+    return Results.Ok(genre);
+});
 
 app.MapPost("/genres", async (Genre genre, IGenresRepository repository) =>
 {
