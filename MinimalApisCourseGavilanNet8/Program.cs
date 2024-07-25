@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 using MinimalApisCourseGavilanNet8;
 using MinimalApisCourseGavilanNet8.Entities;
@@ -59,13 +61,14 @@ app.UseOutputCache();
 //Middleware zone - END
 
 app.MapGet("/", () => "Hello World!");
+
 //app.MapGet("/genres", [EnableCors(policyName: "free")] () => 
 app.MapGet("/genres", async(IGenresRepository repository) => 
 {
     return await repository.GetAll();
 
     //Tiempo que dura la cache si vuelvo a hacer la peticion antes de los 15 segundos me devuelve la info de cache
-}).CacheOutput(c=>c.Expire(TimeSpan.FromSeconds(15)));
+}).CacheOutput(c=>c.Expire(TimeSpan.FromSeconds(15)).Tag("genres-get"));
 
 app.MapGet("/genres/{id:int}", async (int id, IGenresRepository repository) =>
 {
@@ -77,10 +80,32 @@ app.MapGet("/genres/{id:int}", async (int id, IGenresRepository repository) =>
     return Results.Ok(genre);
 });
 
-app.MapPost("/genres", async (Genre genre, IGenresRepository repository) =>
+app.MapPost("/genres", async (Genre genre, IGenresRepository repository, 
+    IOutputCacheStore outputCacheStore) =>
 {
     var id = await repository.Create(genre);
+
+    await outputCacheStore.EvictByTagAsync("genres-get", default);
+
     return Results.Created($"/Genres/{id}", genre);
+});
+
+app.MapPut("/genres/{id:int}", async (int id, Genre genre,IGenresRepository repository,
+    IOutputCacheStore outputCacheStore) =>
+{
+    var exists= await repository.Exists(id);
+
+    if (!exists)
+    {
+        return Results.NotFound();
+    }
+
+    await repository.Update(genre);
+
+    await outputCacheStore.EvictByTagAsync("genres-get", default);
+
+    return Results.NoContent();
+
 });
 
 app.Run();
