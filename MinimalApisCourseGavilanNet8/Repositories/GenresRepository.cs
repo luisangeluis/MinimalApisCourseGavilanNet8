@@ -19,6 +19,11 @@ namespace MinimalApisCourseGavilanNet8.Repositories
             return genre.Id;
         }
 
+        public async Task Delete(int id)
+        {
+            await context.Genres.Where(g => g.Id == id).ExecuteDeleteAsync();
+        }
+
         public async Task<bool> Exists(int id)
         {
             return await context.Genres.AnyAsync(gen => gen.Id == id);
@@ -40,5 +45,7 @@ namespace MinimalApisCourseGavilanNet8.Repositories
             context.Update(genre);
             await context.SaveChangesAsync();
         }
+
+        
     }
 }

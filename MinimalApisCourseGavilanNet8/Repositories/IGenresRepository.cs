@@ -10,5 +10,7 @@ namespace MinimalApisCourseGavilanNet8.Repositories
 
         Task<bool> Exists(int id);
         Task Update(Genre genre);
+
+        Task Delete(int id);
     }
 }
