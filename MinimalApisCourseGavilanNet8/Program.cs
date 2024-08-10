@@ -67,6 +67,7 @@ app.UseOutputCache();
 app.MapGet("/", () => "Hello World!");
 
 app.MapGroup("/genres").MapGenres();
+app.MapGroup("/actors").MapActors();
 
 
 
